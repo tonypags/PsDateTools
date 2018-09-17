@@ -1,4 +1,4 @@
-function Set-DateTructate {
+function Set-DateTruncate {
     [CmdletBinding(DefaultParameterSetName="TructateMinutes")]
     param (
         # The datetime object to affect
