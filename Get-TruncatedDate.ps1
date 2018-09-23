@@ -3,12 +3,12 @@ function Get-TruncatedDate
     [CmdletBinding ()]
     Param
     (
-        [Parameter (Position = 0,
-                    ValueFromPipeline)]
+        [Parameter (Position=0,
+                    ValueFromPipeline=$true)]
         [datetime[]]
         $Date = $(Get-Date),
 
-        [Parameter (Position = 1)]
+        [Parameter (Position=1)]
         [ValidateSet (
             'Millisecond',
             'Second',
