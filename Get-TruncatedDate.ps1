@@ -26,20 +26,20 @@ process {
     switch ($Truncate)
         {
             'MilliSecond' {
-                $GD_Params = @{
+                $DateSplat = @{
                     MilliSecond = 0
                 }
                 break
             }
             'Second' {
-                $GD_Params = @{
+                $DateSplat = @{
                     MilliSecond = 0
                     Second = 0
                 }
                 break
             }
             'Minute' {
-                $GD_Params = @{
+                $DateSplat = @{
                     MilliSecond = 0
                     Second = 0
                     Minute = 0
@@ -47,7 +47,7 @@ process {
                 break
             }
             'Hour' {
-                $GD_Params = @{
+                $DateSplat = @{
                     MilliSecond = 0
                     Second = 0
                     Minute = 0
@@ -56,7 +56,7 @@ process {
                 break
             }
             'Day' {
-                $GD_Params = @{
+                $DateSplat = @{
                     MilliSecond = 0
                     Second = 0
                     Minute = 0
@@ -66,7 +66,7 @@ process {
                 break
             }
             'Month' {
-                $GD_Params = @{
+                $DateSplat = @{
                     MilliSecond = 0
                     Second = 0
                     Minute = 0
@@ -78,11 +78,11 @@ process {
             }
         } # end switch ($Truncate)
 
-    foreach ($D_Item in $Date)
+    foreach ($Item in $Date)
         {
-            $D_Item | Get-Date @GD_Params
+            $Item | Get-Date @DateSplat
         }
-    } # end process {}
+    } # end process block
 
 end {}
 
