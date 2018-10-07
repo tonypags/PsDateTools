@@ -1,4 +1,4 @@
-function Get-RfaHolidays {
+function Get-NyseHolidays {
     [CmdletBinding()]
     [OutputType([datetime[]])]
     param (
