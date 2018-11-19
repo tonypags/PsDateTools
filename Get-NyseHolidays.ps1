@@ -22,7 +22,7 @@ function Get-NyseHolidays {
 
             # All Dates can now be resolved from remaining rows
             $numRecords = $rawTable.count
-            $rawTable[1..$numRecords] | Foreach-Object {
+            $rawTable[1..($numRecords-1)] | Foreach-Object {
                 Get-Date "$($_.P2.TrimEnd('*') -replace '\s\(.*\)') $($ColumnOrder[1])"
                 Get-Date "$($_.P3.TrimEnd('*') -replace '\s\(.*\)') $($ColumnOrder[2])"
                 Get-Date "$($_.P4.TrimEnd('*') -replace '\s\(.*\)') $($ColumnOrder[3])"
