@@ -70,7 +70,7 @@ function Find-DateByWeekNumber
                    ParameterSetName='MonthRange')]
         [ValidateNotNull()]
         [datetime]
-        $StartDate=((Get-Date).ToShortDateString()),
+        $StartDate=($Now.ToShortDateString()),
 
         # Param3 help description
         [Parameter(Position=3,
@@ -88,7 +88,13 @@ function Find-DateByWeekNumber
         # Switch to return entire year's worth of dates. 
         [Parameter(ParameterSetName='FullYear')]
         [switch]
-        $FullYear
+        $FullYear,
+
+        # Month to limit result. 
+        [Parameter(ParameterSetName='OneMonth')]
+        [ValidateSet('January','February','March','April','May','June','July','August','September','October','November','December')]
+        [string]
+        $Month
     )
 
     Begin
@@ -102,6 +108,28 @@ function Find-DateByWeekNumber
     }
     End
     {
+        # Resolve Month
+        if($PsCmdlet.ParameterSetName -eq 'OneMonth'){
+            switch ($Month) {
+                January { $StartDate = Get-Date '1/1' | Get-TruncatedDate -Truncate Month }
+                February { $StartDate = Get-Date '2/1' | Get-TruncatedDate -Truncate Month }
+                March { $StartDate = Get-Date '3/1' | Get-TruncatedDate -Truncate Month }
+                April { $StartDate = Get-Date '4/1' | Get-TruncatedDate -Truncate Month }
+                May { $StartDate = Get-Date '5/1' | Get-TruncatedDate -Truncate Month }
+                June { $StartDate = Get-Date '6/1' | Get-TruncatedDate -Truncate Month }
+                July { $StartDate = Get-Date '7/1' | Get-TruncatedDate -Truncate Month }
+                August { $StartDate = Get-Date '8/1' | Get-TruncatedDate -Truncate Month }
+                September { $StartDate = Get-Date '9/1' | Get-TruncatedDate -Truncate Month }
+                October { $StartDate = Get-Date '10/1' | Get-TruncatedDate -Truncate Month }
+                November { $StartDate = Get-Date '11/1' | Get-TruncatedDate -Truncate Month }
+                December { $StartDate = Get-Date '12/1' | Get-TruncatedDate -Truncate Month }
+                Default {
+                    [datetime]$StartDate=$Now | Get-TruncatedDate -Truncate Month
+                    [datetime]$EndDate=$StartDate.AddMonths(1).AddSeconds(-1)
+                }
+            }
+        }
+        
         # Resolve FullYear switch
         if($FullYear){
             [datetime]$StartDate='1/1'
@@ -203,4 +231,3 @@ function Find-DateByWeekNumber
         Write-Output $ResultDates
     }
 }
-
