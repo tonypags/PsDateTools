@@ -51,35 +51,35 @@ function Find-DateByWeekNumber
     [OutputType([datetime[]])]
     Param
     (
-        # Param1 help description
+        # A number or ordnial indicating which week of the month.
         [Parameter(Mandatory=$true,
                    Position=0)]
         [ValidateSet('1','2','3','4','5','1st','First','2nd','Second','3rd','Third','4th','Fourth','5th','Fifth','Last')]
         [string]
         $WeekNumber,
 
-        # Param2 help description
+        # The day of the week, ie: Friday.
         [Parameter(Mandatory=$true,
                    Position=1)]
         [ValidateSet('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday','Mon','Tue','Tues','Wed','Weds','Thu','Thurs','Fri','Sat','Sun')]
         [string]
         $DayOfWeek,
 
-        # Param3 help description
+        # Start of the MonthRange.
         [Parameter(Position=2,
                    ParameterSetName='MonthRange')]
         [ValidateNotNull()]
         [datetime]
         $StartDate=((Get-Date).ToShortDateString()),
 
-        # Param3 help description
+        # End of the MonthRange.
         [Parameter(Position=3,
                    ParameterSetName='MonthRange')]
         [ValidateNotNull()]
         [datetime]
         $EndDate=$StartDate,
 
-        # Switch to return entire year's worth of dates. 
+        # Set the hour of day returned with the date (24h).
         [Parameter(Position=4)]
         [ValidateRange(0,23)]
         [int16]
