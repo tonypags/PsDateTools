@@ -1,115 +1,160 @@
-﻿<#
-.Synopsis
-   Find-DateByWeekNumber
-.DESCRIPTION
-   Long description
-.EXAMPLE
-   Find-DateByWeekNumber 2 sat
-
-Saturday, June 09, 2018 12:00:00 AM
-Returns only the current month
-.EXAMPLE
-   Find-DateByWeekNumber 2 sat '6/1' '9/30'
-
-Saturday, June 09, 2018 12:00:00 AM
-Saturday, July 14, 2018 12:00:00 AM
-Saturday, August 11, 2018 12:00:00 AM
-Saturday, September 08, 2018 12:00:00 AM
-.EXAMPLE
-   Find-DateByWeekNumber 3 sat -FullYear
-
-Saturday, January 20, 2018 12:00:00 AM
-Saturday, February 17, 2018 12:00:00 AM
-Saturday, March 17, 2018 12:00:00 AM
-Saturday, April 21, 2018 12:00:00 AM
-Saturday, May 19, 2018 12:00:00 AM
-Saturday, June 16, 2018 12:00:00 AM
-Saturday, July 21, 2018 12:00:00 AM
-Saturday, August 18, 2018 12:00:00 AM
-Saturday, September 15, 2018 12:00:00 AM
-Saturday, October 20, 2018 12:00:00 AM
-Saturday, November 17, 2018 12:00:00 AM
-Saturday, December 15, 2018 12:00:00 AM
-.INPUTS
-   Inputs to this cmdlet (if any)
-.OUTPUTS
-   Output from this cmdlet (if any)
-.NOTES
-   General notes
-.COMPONENT
-   The component this cmdlet belongs to
-.ROLE
-   The role this cmdlet belongs to
-.FUNCTIONALITY
-   The functionality that best describes this cmdlet
-#>
-function Find-DateByWeekNumber
+﻿function Find-DateByWeekNumber
 {
-    [CmdletBinding(DefaultParameterSetName='MonthRange', 
-                  PositionalBinding=$false)]
+    <#
+    .Synopsis
+        Returns array of dates as specified by Ordinal and weekday.
+    .DESCRIPTION
+        Returns a date as specified by required parameters 
+        the first (Ordinal) represents the week of the month and the second 
+        (DayOfWeek) represents the weekday. Returns an array of dates 
+        when either the FullYear or ThisYear switches are enabled, or the 
+        "MonthDate" (StartDate AND EndDate) parameters are entered and valid.
+    .PARAMETER Ordinal
+        The string that represents the number of the week, ie: '3rd'.
+    .PARAMETER DayOfWeek
+        The day of the week, ie Monday (or mon).
+    .PARAMETER StartDate
+        Day to start MonthRange of returned datetime values.
+    .PARAMETER EndDate
+        Day to start MonthRange of returned datetime values. Must be after StartDate.
+    .PARAMETER ThisYear
+        Option to return dates over 12 months from January to December.
+    .PARAMETER FullYear
+        Option to return dates over 12 months starting from the current month.
+    .PARAMETER Hour
+        Set the hour of day returned with the date (24h). Defaults to 0 (12AM).
+    .EXAMPLE
+        Find-DateByWeekNumber 2 sat
+
+        Saturday, June 09, 2018 12:00:00 AM
+        Returns only the current month
+    .EXAMPLE
+        Find-DateByWeekNumber 2 sat '6/1' '9/30'
+
+        Saturday, June 09, 2018 12:00:00 AM
+        Saturday, July 14, 2018 12:00:00 AM
+        Saturday, August 11, 2018 12:00:00 AM
+        Saturday, September 08, 2018 12:00:00 AM
+    .EXAMPLE
+        Find-DateByWeekNumber 3 sat -ThisYear
+
+        Saturday, January 20, 2018 12:00:00 AM
+        Saturday, February 17, 2018 12:00:00 AM
+        Saturday, March 17, 2018 12:00:00 AM
+        Saturday, April 21, 2018 12:00:00 AM
+        Saturday, May 19, 2018 12:00:00 AM
+        Saturday, June 16, 2018 12:00:00 AM
+        Saturday, July 21, 2018 12:00:00 AM
+        Saturday, August 18, 2018 12:00:00 AM
+        Saturday, September 15, 2018 12:00:00 AM
+        Saturday, October 20, 2018 12:00:00 AM
+        Saturday, November 17, 2018 12:00:00 AM
+        Saturday, December 15, 2018 12:00:00 AM
+    .INPUTS
+        This function does not accept pipeline input.
+    .OUTPUTS
+        Output from this cmdlet is a .Net datetime arraylist.
+    #>
+    [CmdletBinding(DefaultParameterSetName='MonthRange')]
     [Alias('month')]
     [OutputType([datetime[]])]
     Param
     (
-        # A number or ordnial indicating which week of the month.
+        # A number or string ordnial indicating which week of the month.
         [Parameter(Mandatory=$true,
-                   Position=0)]
-        [ValidateSet('1','2','3','4','5','1st','First','2nd','Second','3rd','Third','4th','Fourth','5th','Fifth','Last')]
+                    Position=0)]
+        [ValidateSet('1st','2nd','3rd','4th','5th','Last',
+            'First','Second','Third','Fourth','Fifth',
+            '1','2','3','4','5')]
         [string]
-        $WeekNumber,
+        $Ordinal,
 
-        # The day of the week, ie: Friday.
+        # The weekday, ie: Friday.
         [Parameter(Mandatory=$true,
-                   Position=1)]
-        [ValidateSet('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday','Mon','Tue','Tues','Wed','Weds','Thu','Thurs','Fri','Sat','Sun')]
+                    Position=1)]
+        [ValidateSet('Monday','Tuesday','Wednesday',
+            'Thursday','Friday','Saturday','Sunday',
+            'Mon','Tue','Tues','Wed','Weds','Thu',
+            'Thur','Thurs','Fri','Sat','Sun')]
         [string]
         $DayOfWeek,
 
-        # Start of the MonthRange.
+        # Day to start MonthRange of returned datetime values.
         [Parameter(Position=2,
                    ParameterSetName='MonthRange')]
         [ValidateNotNull()]
         [datetime]
-        $StartDate=((Get-Date).ToShortDateString()),
+        $StartDate,
 
-        # End of the MonthRange.
+        # Day to end MonthRange of returned datetime values. Must be after StartDate.
         [Parameter(Position=3,
                    ParameterSetName='MonthRange')]
-        [ValidateNotNull()]
+        [ValidateScript({$_ -ge $StartDate})]
         [datetime]
-        $EndDate=$StartDate,
+        $EndDate,
 
-        # Set the hour of day returned with the date (24h).
+        # Option to return dates over 12 months from January to December.
+        [Parameter(ParameterSetName='ThisYear')]
+        [switch]
+        $ThisYear,
+
+        # Option to return dates over 12 months starting from the current month.
+        [Parameter(ParameterSetName='FullYear')]
+        [switch]
+        $FullYear,
+
+        # Set the hour of day returned with the date (24h). Defaults to 0 (12AM).
         [Parameter(Position=4)]
         [ValidateRange(0,23)]
         [int16]
-        $Hour=0,
-
-        # Switch to return entire year's worth of dates. 
-        [Parameter(ParameterSetName='FullYear')]
-        [switch]
-        $FullYear
+        $Hour=0
     )
 
     Begin
     {
-        $Now = Get-Date
         $ResultDates = New-Object System.Collections.ArrayList
-        $Last = $false
     }
     Process
     {
     }
     End
     {
-        # Resolve FullYear switch
-        if($FullYear){
-            [datetime]$StartDate='1/1'
-            [datetime]$EndDate='12/31'
+
+        # Handle Most Parameters
+        if ($ThisYear) {
+
+            # Get this years first and last day
+            [datetime]$StartDate = Get-Date | Get-TruncatedDate -Truncate Month
+            $EndDate = $StartDate.AddYears(1).AddDays(-1)
+
+        } elseif ($FullYear) {
+
+            # Get this month's first day, then add a year and minus a day
+            $StartDate = Get-Date | Get-TruncatedDate -Truncate Day
+            $EndDate = $StartDate.AddYears(1).AddDays(-1)
+
+        } elseif ($StartDate) {
+
+            # Truncate the entered dates' times
+            $StartDate = $StartDate | Get-TruncatedDate -Truncate Hour
+            $EndDate = $EndDate | Get-TruncatedDate -Truncate Hour
+
+        } elseif (!$StartDate) {
+            
+            # By default just this month's first and last days
+            $StartDate = Get-Date | Get-TruncatedDate -Truncate Day
+            $EndDate = $StartDate.AddMonths(1).AddDays(-1)
+
+        }
+
+        # Handle Hour Parameter
+        if ($Hour) {
+            $StartDate = $StartDate.AddHours($Hour)
+            $EndDate = $EndDate.AddHours($Hour)
         }
         
         # Resolve the user input to an integer. 
-        $intWeekNumber = switch ($WeekNumber)
+        $intWeekNumber = switch ($Ordinal)
         {
             '1' {1}
             '2' {2}
@@ -127,7 +172,7 @@ function Find-DateByWeekNumber
             '5th' {5}
             'Fifth' {5}
             'Last' {-1}
-            Default {0}
+            Default {}
         }
 
         # Resolve the user input to a weekday full name
@@ -146,61 +191,51 @@ function Find-DateByWeekNumber
             'Wed' {'Wednesday'}
             'Weds' {'Wednesday'}
             'Thu' {'Thursday'}
+            'Thur' {'Thursday'}
             'Thurs' {'Thursday'}
             'Fri' {'Friday'}
             'Sat' {'Saturday'}
             'Sun' {'Sunday'}
-            Default {throw 'invalid weekday';Exit}
+            Default {}
         }
 
-        # this is so the loop below doesn't stop 1 month early
-        $EndDate = $EndDate.AddMonths(1) 
-        
-        # Isolate the month string value, and year int value
-        [int]$StartMonth= $StartDate.Month
-        [int]$EndMonth  = $EndDate.Month
-        [int]$StartYear= $StartDate.Year
-        [int]$EndYear  = $EndDate.Year
+        # Assign the ordinals their 7-day ranges
+        $intDayRange = switch ($intWeekNumber) {
+            1 {1..7}
+            2 {8..14}
+            3 {15..21}
+            4 {22..28}
+            5 {29..31}
+            Default {}
+        }
 
-        # Weeknumber TIMES 7 and then MINUS 7 to find search start date, +1 again to avoid miscalculation of week by -1 in March.
-        if($intWeekNumber -gt 5){throw 'invalid week number';Exit}
-        if($intWeekNumber -gt 0){
-            $iSearch = $intWeekNumber * 7 - 7 + 1
-        }elseif($intWeekNumber -eq -1){
-            $Last = $true
-        }else{throw 'invalid week number';Exit}
-        
-        # Start the loop off at the start month. 
-        $testDate = Get-Date -Year $StartYear -Month $StartMonth -Hour $Hour -Minute 0 -Second 0 -Millisecond 0
+        # Start at the beginning
+        $LoopDate = $StartDate
+        While ($LoopDate -le $EndDate) {
+            
+            # Handle Last case
+            if ($Ordinal -eq 'Last') {
 
-        # Repeat for each month in range until the last month matches the given + 1 as calculated above ON $EndMonth = $EndMonth.AddMonths(1) 
-        While(!(
-            ($EndMonth -eq ($testDate.Month)) -and 
-            ($EndYear  -eq ($testDate.Year ))
-        ))
-        {
-            $iWeekday=$null
-            # Then add 1 until you find the dates to match
-            for (
-                %{if($Last){$i = 31}else{$i = $iSearch}};
-                $iWeekday -ne $strDayOfWeek;
-                %{if($Last){$i--}else{$i++}}
-            )
-            {
-                # Make a date within the current month the day = $i
-                $testDate = Get-Date $testDate -Day $i
-                # Grab that date's "day of week" string value
-                $iWeekday = $testDate.DayOfWeek
-                
-                if($iWeekday -eq $strDayOfWeek){
-                    [void]$ResultDates.Add($testDate)
-                    $testDate = $testDate.AddMonths(1)
-                }
+                $LastDay = Resolve-LastDayInMonth -Date $LoopDate
+                $intDayRange = ($LastDay - 6)..($LastDay)
+
             }
+
+            if (
+                # If this date is in day range
+                $intDayRange -contains $LoopDate.Day -and
+                # AND the weekday matches
+                $LoopDate.DayOfWeek -eq $strDayOfWeek
+            ) {
+                # Add the date to the array
+                [void]($ResultDates.Add($LoopDate))
+            }
+
+            # Increment date before looping
+            $LoopDate = $LoopDate.AddDays(1)
         }
-        
+
         # Output the result
         Write-Output $ResultDates
     }
 }
-
