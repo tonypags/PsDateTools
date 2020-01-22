@@ -9,7 +9,7 @@ function ConvertFrom-GlobalDateString {
         'Date' {$DateFormat} ;
         'Time' {$TimeFormat} ;
         'Both' {"$DateFormat $TimeFormat"} ;
-        Default {'Unhandled parameter value'}
+        Default {throw 'Unhandled parameter value'}
     }
 
     [DateTime]::ParseExact(
