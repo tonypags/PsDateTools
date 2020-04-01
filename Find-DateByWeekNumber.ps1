@@ -130,7 +130,7 @@
         } elseif ($FullYear) {
 
             # Get this month's first day, then add a year and minus a day
-            $StartDate = Get-Date | Get-TruncatedDate -Truncate Day
+            $StartDate = Get-Date | Get-TruncatedDate -Truncate Hour
             $EndDate = $StartDate.AddYears(1).AddDays(-1)
 
         } elseif ($StartDate) {
