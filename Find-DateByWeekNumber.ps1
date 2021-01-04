@@ -17,6 +17,8 @@
         Day to start MonthRange of returned datetime values.
     .PARAMETER EndDate
         Day to start MonthRange of returned datetime values. Must be after StartDate.
+    .PARAMETER Month
+        Option to return dates over specified month.
     .PARAMETER ThisYear
         Option to return dates over 12 months from January to December.
     .PARAMETER FullYear
@@ -103,7 +105,7 @@
         [switch]
         $FullYear,
 
-        # Month to limit result. 
+        # Option to return dates over specified month.
         [Parameter(ParameterSetName='OneMonth')]
         [ValidateSet('January','February','March','April','May','June','July','August','September','October','November','December')]
         [string]
@@ -118,6 +120,7 @@
 
     Begin
     {
+        Write-Verbose "Define Array"
         $ResultDates = New-Object System.Collections.ArrayList
     }
     Process
@@ -128,6 +131,7 @@
 
         # Handle Month
         if($PsCmdlet.ParameterSetName -eq 'OneMonth'){
+            Write-Verbose "Handle Month"
             switch ($Month) {
                 January { $StartDate = Get-Date '1/1' | Get-TruncatedDate -Truncate Day }
                 February { $StartDate = Get-Date '2/1' | Get-TruncatedDate -Truncate Day }
@@ -152,24 +156,28 @@
         # Handle Most Parameters
         if ($ThisYear) {
 
+            Write-Verbose "Handle ThisYear"
             # Get this years first and last day
             [datetime]$StartDate = Get-Date | Get-TruncatedDate -Truncate Month
             $EndDate = $StartDate.AddYears(1).AddDays(-1)
 
         } elseif ($FullYear) {
 
+            Write-Verbose "Handle FullYear"
             # Get this month's first day, then add a year and minus a day
             $StartDate = Get-Date | Get-TruncatedDate -Truncate Hour
             $EndDate = $StartDate.AddYears(1).AddDays(-1)
 
         } elseif ($StartDate) {
 
+            Write-Verbose "Handle StartDate"
             # Truncate the entered dates' times
             $StartDate = $StartDate | Get-TruncatedDate -Truncate Hour
             $EndDate = $EndDate | Get-TruncatedDate -Truncate Hour
 
         } elseif (!$StartDate) {
             
+            Write-Verbose "Handle NO StartDate"
             # By default just this month's first and last days
             $StartDate = Get-Date | Get-TruncatedDate -Truncate Day
             $EndDate = $StartDate.AddMonths(1).AddDays(-1)
@@ -178,11 +186,13 @@
 
         # Handle Hour Parameter
         if ($Hour) {
+            Write-Verbose "Handle Hour"
             $StartDate = $StartDate.AddHours($Hour)
             $EndDate = $EndDate.AddHours($Hour)
         }
         
         # Resolve the user input to an integer. 
+        Write-Verbose "Handle Ordinal"
         $intWeekNumber = switch ($Ordinal)
         {
             '1' {1}
@@ -205,6 +215,7 @@
         }
 
         # Resolve the user input to a weekday full name
+        Write-Verbose "Handle DayOfWeek"
         $strDayOfWeek = switch ($DayOfWeek)
         {
             'Monday' {'Monday'}
@@ -229,6 +240,7 @@
         }
 
         # Assign the ordinals their 7-day ranges
+        Write-Verbose "Handle intWeekNumber"
         $intDayRange = switch ($intWeekNumber) {
             1 {1..7}
             2 {8..14}
@@ -240,6 +252,7 @@
 
         # Start at the beginning
         $LoopDate = $StartDate
+        Write-Verbose "Entering LoopDate"
         While ($LoopDate -le $EndDate) {
             
             # Handle Last case
@@ -265,6 +278,7 @@
         }
 
         # Output the result
+        Write-Verbose "Output pending"
         Write-Output $ResultDates
     }
 }
