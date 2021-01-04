@@ -86,7 +86,7 @@
                    ParameterSetName='MonthRange')]
         [ValidateNotNull()]
         [datetime]
-        $StartDate=($Now.ToShortDateString()),
+        $StartDate,
 
         # Day to end MonthRange of returned datetime values. Must be after StartDate.
         [Parameter(Position=3,
