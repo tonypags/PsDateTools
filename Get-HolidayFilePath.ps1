@@ -4,5 +4,6 @@ function Get-HolidayFilePath {
         
     )
     
-    'T:\Automation\Data Dictionary\Automation Global Variables\Holidays.txt'
+    Join-Path (Split-Path $PSCommandPath -Parent) 'lib\Holidays.txt' 
+
 }

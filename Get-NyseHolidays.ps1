@@ -7,13 +7,7 @@ function Get-NyseHolidays {
     
     Process {
         # Look at the stored values for this first.
-        
-        #$HolidayFilePath = Join-Path (Split-Path $PSCommandPath -Parent) 'lib\Holidays.txt' 
-        #### This is wrong, needs to be the command at scope 0 (i think), i've done this before in the DB modules
-        #$HolidayFilePath = Get-HolidayFilePath # new function to handle this path, but keeping it statis for now, below.
-        # Temp solution is below (static def)
-
-        $HolidayFilePath = 'T:\Automation\Data Dictionary\Automation Global Variables\Holidays.txt'
+        $HolidayFilePath = Get-HolidayFilePath
         $staticHolidays = (Get-Content $HolidayFilePath) -as [datetime[]] | Sort-Object
         if ($staticHolidays[-1] -gt (Get-Date)) {
             Write-Output $staticHolidays
