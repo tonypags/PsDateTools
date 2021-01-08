@@ -1,4 +1,37 @@
 function Get-NyseHolidays {
+    [datetime[]]@(
+        'Monday, January 18, 2021 12:00:00 AM'
+        'Monday, February 15, 2021 12:00:00 AM'
+        'Friday, April 2, 2021 12:00:00 AM'
+        'Monday, May 31, 2021 12:00:00 AM'
+        'Monday, July 5, 2021 12:00:00 AM'
+        'Monday, September 6, 2021 12:00:00 AM'
+        'Thursday, November 25, 2021 12:00:00 AM'
+        'Friday, December 24, 2021 12:00:00 AM'
+        'Friday, December 31, 2021 12:00:00 AM'
+        'Monday, January 17, 2022 12:00:00 AM'
+        'Monday, February 21, 2022 12:00:00 AM'
+        'Friday, April 15, 2022 12:00:00 AM'
+        'Monday, May 30, 2022 12:00:00 AM'
+        'Monday, July 4, 2022 12:00:00 AM'
+        'Monday, September 5, 2022 12:00:00 AM'
+        'Thursday, November 24, 2022 12:00:00 AM'
+        'Monday, December 26, 2022 12:00:00 AM'
+        'Monday, January 2, 2023 12:00:00 AM'
+        'Monday, January 16, 2023 12:00:00 AM'
+        'Monday, February 20, 2023 12:00:00 AM'
+        'Friday, April 7, 2023 12:00:00 AM'
+        'Monday, May 29, 2023 12:00:00 AM'
+        'Tuesday, July 4, 2023 12:00:00 AM'
+        'Monday, September 4, 2023 12:00:00 AM'
+        'Thursday, November 23, 2023 12:00:00 AM'
+        'Monday, December 25, 2023 12:00:00 AM'
+        'Monday, January 1, 2024 12:00:00 AM'
+    )
+}
+
+<# BROKEN LOGIC, based off web scraping
+function Get-NyseHolidays {
     [CmdletBinding()]
     [OutputType([datetime[]])]
     param (
@@ -64,3 +97,4 @@ function Get-NyseHolidays {
         }#if ($staticHolidays[-1] -gt (Get-Date)) {
     }
 }
+#>
