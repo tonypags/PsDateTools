@@ -20,9 +20,9 @@
     .PARAMETER Month
         Option to return dates over specified month.
     .PARAMETER ThisYear
-        Option to return dates over 12 months from January to December.
+        Option to return dates over 12 months from January to December of the current year.
     .PARAMETER FullYear
-        Option to return dates over 12 months starting from the current month.
+        Option to return dates over 12 months starting from the current date.
     .PARAMETER Hour
         Set the hour of day returned with the date (24h). Defaults to 0 (12AM).
     .EXAMPLE
