@@ -1,4 +1,8 @@
-function Get-NyseHolidays {
+
+
+
+
+<#function Get-NyseHolidays {
     [datetime[]]@(
         'Monday, January 18, 2021 12:00:00 AM'
         'Monday, February 15, 2021 12:00:00 AM'
@@ -28,7 +32,7 @@ function Get-NyseHolidays {
         'Monday, December 25, 2023 12:00:00 AM'
         'Monday, January 1, 2024 12:00:00 AM'
     )
-}
+}#>
 
 <# BROKEN LOGIC, based off web scraping
 function Get-NyseHolidays {
