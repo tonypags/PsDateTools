@@ -1,7 +1,3 @@
-
-
-
-
 <#function Get-NyseHolidays {
     [datetime[]]@(
         'Monday, January 18, 2021 12:00:00 AM'
