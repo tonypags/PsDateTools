@@ -1,12 +1,32 @@
 ﻿<#
 .Synopsis
-   Determines the previous or next date from the current or imported date. 
+Determines the previous or next date from the current or imported date. 
 .DESCRIPTION
-   Calulates a date based on a start date, a day of the week, and an offset in weeks. 
-.INPUTS
-   Inputs to this cmdlet (if any)
-.OUTPUTS
-   Output from this cmdlet (if any)
+Calulates a date based on a start date, a day of the week, and an offset in weeks. 
+.EXAMPLE
+Find the next Monday after today.
+
+Find-Weekday -Date (Get-Date) -DayOfWeek Mon
+.EXAMPLE
+Find the last Monday before today.
+
+Find-Weekday -Date (Get-Date) -DayOfWeek Mon -Backwards
+.EXAMPLE
+Find the next Friday that isn't a holiday, as defined by an external file.
+
+Find-Weekday -Date (Get-Date) -DayOfWeek Friday -ExcludeHolidays (
+    Get-Content c:\temp\holidays.txt)
+.EXAMPLE
+Find the next or last weekday. 
+
+PS > $SomeDate
+Friday, July 30, 2021 10:48:12 PM
+
+PS > $SomeDate | Find-Weekday -Next
+Monday, August 2, 2021 10:48:12 PM
+
+PS > $SomeDate | Find-Weekday -Last
+Thursday, July 29, 2021 10:48:12 PM
 #>
 function Find-Weekday 
 {
@@ -29,8 +49,12 @@ function Find-Weekday
         [Parameter(Mandatory=$true,
                    Position=1,
                    ParameterSetName='AnyWeekday')]
-        [ValidateSet('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
-            'Saturday','Sun', 'Mon', 'Tue', 'Tues', 'Wed', 'Weds', 'Thu', 'Thur', 'Thurs', 'Fri', 'Sat')]
+        [ValidateSet(
+            'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+            'Thursday', 'Friday', 'Saturday','Sun',
+            'Mon', 'Tue', 'Tues', 'Wed', 'Weds', 
+            'Thu', 'Thur', 'Thurs', 'Fri', 'Sat'
+        )]
         [string]
         $DayOfWeek,
 
@@ -42,12 +66,12 @@ function Find-Weekday
         # Find the next weekday in the future
         [Parameter(ParameterSetName='NextWeekday')]
         [switch]
-        $Next=$false,
+        $Next,
 
         # Find the last weekday in the past
         [Parameter(ParameterSetName='LastWeekday')]
         [switch]
-        $Last=$false,
+        $Last,
 
         # A collection of more dates of which to exclude 
         [datetime[]]
@@ -66,7 +90,8 @@ function Find-Weekday
                 $Date = $Date.AddDays($UpOrDown)
             }until(
                 ($DayOfWeek -like 
-                    "$(([regex]::Match((($Date).DayOfWeek),'...')).value)*") -and
+                    "$(([regex]::Match((($Date).DayOfWeek),'...')).value)*"
+                ) -and
                 ($ExcludeHolidays -notcontains $Date)
             )
         }elseif($PSCmdlet.ParameterSetName -eq 'NextWeekday'){
