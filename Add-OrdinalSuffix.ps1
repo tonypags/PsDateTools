@@ -8,12 +8,7 @@ Function Add-OrdinalSuffix {
 
     Process {
         foreach ($N in $Num) {
-            $Suffix = Switch -regex ($N) {
-                '.?1$'      { 'st'; break }
-                '.?2$'      { 'nd'; break }
-                '.?3$'      { 'rd'; break }
-                default     { 'th'; break }
-            }
+            $Suffix = Get-OrdinalSuffix
             Write-Output "$N$Suffix"
         }
     }
