@@ -2,14 +2,17 @@
 Function Get-OrdinalSuffix {
     Param(
         [Parameter(Mandatory=$true)]
-        [int64]$num
+        [int64]$Num
     )
 
-    $Suffix = Switch -regex ($Num) {
+    switch -regex ($Num) {
+        '.?11$'     { 'th'; break }
+        '.?12$'     { 'th'; break }
+        '.?13$'     { 'th'; break }
         '.?1$'      { 'st'; break }
         '.?2$'      { 'nd'; break }
         '.?3$'      { 'rd'; break }
         default     { 'th'; break }
     }
-    Write-Output "$Suffix"
+
 }
