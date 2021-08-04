@@ -27,4 +27,6 @@ function Convert-UtcToLocal {
     $TZ = [System.TimeZoneInfo]::FindSystemTimeZoneById($strCurrentTimeZone)
     [System.TimeZoneInfo]::ConvertTimeFromUtc($UtcDate, $TZ)
     
+    Write-Warning "This function is depreciated. Use 'ConvertTo-LocalTime -Utc' instead."
+
 }#END: function Convert-UtcToLocal {}
