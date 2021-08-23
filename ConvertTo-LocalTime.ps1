@@ -56,9 +56,19 @@ function ConvertTo-LocalTime {
     Verbose output indicates the time zone and its UTC offset.
 
     .NOTES
+    This function is slow, but robostly able to convert times. For speedier
+    logic when looping many records, try using this:
+    
+    $UtcDate = [datetime]'9/1/2021'
+    $strCurrentTimeZone = (Get-WmiObject win32_timezone).StandardName
+    $TZ = [System.TimeZoneInfo]::FindSystemTimeZoneById($strCurrentTimeZone)
+    [System.TimeZoneInfo]::ConvertTimeFromUtc($UtcDate, $TZ)
+
+    ---
     Taken from https://jdhitsolutions.com/blog/powershell/7962/convert-to-local-time-with-powershell/
 
     Learn more about PowerShell: http://jdhitsolutions.com/blog/essential-powershell-resources/
+    ---
     #>
 
     [CmdletBinding(DefaultParameterSetName='ByUtcHardcode')]
