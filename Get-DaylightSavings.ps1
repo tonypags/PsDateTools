@@ -43,7 +43,9 @@ function Get-DaylightSavings {
         StartDate = "$($TZo.StandardMonth)/1"
         EndDate   = "$($TZo.StandardMonth + 1)/1"
     }
-    $stdDate = Find-DateByWeekNumber @stdProps
+    $stdDate = (Find-DateByWeekNumber @stdProps).AddHours(
+        $TZo.StandardHour).AddMinutes($TZo.StandardMinute
+        ).AddSeconds($TZo.StandardSecond).AddMilliseconds($TZo.StandardMillisecond)
     
 
     # This calculates the current year day date that DST changes
@@ -54,7 +56,9 @@ function Get-DaylightSavings {
         StartDate = "$($TZo.DaylightMonth)/1"
         EndDate = "$($TZo.DaylightMonth + 1)/1"
     }
-    $dayDate = Find-DateByWeekNumber @dayProps
+    $dayDate = (Find-DateByWeekNumber @dayProps).AddHours(
+        $TZo.DaylightHour).AddMinutes($TZo.DaylightMinute
+        ).AddSeconds($TZo.DaylightSecond).AddMilliseconds($TZo.DaylightMillisecond)
 
 
     # Now we can know where on the calendar we are now
@@ -82,7 +86,9 @@ function Get-DaylightSavings {
             'EndDate'   ,
             ("$($TZo.StandardMonth + 1)/1/$($Date.Year + 1)")
         )
-        $stdDate = Find-DateByWeekNumber @stdProps
+        $stdDate = (Find-DateByWeekNumber @stdProps).AddHours(
+            $TZo.StandardHour).AddMinutes($TZo.StandardMinute
+            ).AddSeconds($TZo.StandardSecond).AddMilliseconds($TZo.StandardMillisecond)
     }
     if ($Date -ge $dayDate) {
         $dayProps.Set_Item(
@@ -93,7 +99,9 @@ function Get-DaylightSavings {
             'EndDate'   ,
             ("$($TZo.DaylightMonth + 1)/1/$($Date.Year + 1)")
         )
-        $dayDate = Find-DateByWeekNumber @dayProps
+        $dayDate = (Find-DateByWeekNumber @dayProps).AddHours(
+            $TZo.DaylightHour).AddMinutes($TZo.DaylightMinute
+            ).AddSeconds($TZo.DaylightSecond).AddMilliseconds($TZo.DaylightMillisecond)
     }
 
 
