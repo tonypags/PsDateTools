@@ -3,16 +3,11 @@ function Get-DaylightSavings {
     .SYNOPSIS
     Returns info about your timezone's DST
     .DESCRIPTION
-    Returns info about your timezone's DST, including
-    start and end times.
+    Returns info about your timezone's DST, including start and end times.
     .EXAMPLE
-    PS C:\> Get-DaylightSavings 
-    .EXAMPLE
-    PS C:\> Get-DaylightSavings -TimeZone ''
+    Get-DaylightSavings 
     .OUTPUTS
     A PsCustomObject with a Win32_TimeZone object as one of its properties.
-    .NOTES
-    General notes
     #>
     [CmdletBinding()]
     param (
@@ -20,20 +15,12 @@ function Get-DaylightSavings {
         [Parameter(Position=0)]
         [ValidateNotNull()]
         [datetime]
-        $Date = (Get-Date),
-
-        # Optionally give a non-local time zone
-        [Parameter(Position=1)]
-        [ValidateNotNull()]
-        [string]
-        $TimeZone = (Get-WmiObject win32_timezone).StandardName
+        $Date = (Get-Date)
     )
     
+    $TimeZone = (Get-WmiObject win32_timezone).StandardName
     $TZa = [System.TimeZoneInfo]::FindSystemTimeZoneById($TimeZone)
-
-    # This gets the dates where the system changed (last 2007)
-    [void]$TZa.GetAdjustmentRules().DaylightTransitionStart
-    [void]$TZa.GetAdjustmentRules().DaylightTransitionEnd
+    $TZo = (Get-WmiObject win32_timezone)
 
     # We'll use this logic twice
     $indexToDayOfWeek = {param($index)
@@ -49,7 +36,6 @@ function Get-DaylightSavings {
     }
 
     # This calculates the current year std date that DST changes
-    $TZo = (Get-WmiObject win32_timezone)
     $stdDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.StandardDayOfWeek)
     $stdProps = @{
         Ordinal = $TZo.StandardDay
@@ -69,6 +55,7 @@ function Get-DaylightSavings {
         EndDate = "$($TZo.DaylightMonth + 1)/1"
     }
     $dayDate = Find-DateByWeekNumber @dayProps
+
 
     # Now we can know where on the calendar we are now
     if ($Date -ge $stdDate -or $Date -lt $dayDate) {
@@ -109,6 +96,7 @@ function Get-DaylightSavings {
         $dayDate = Find-DateByWeekNumber @dayProps
     }
 
+
     # Now the next date for change is
     $UntilNextChange = @(
         [timespan]($stdDate - $Date)
@@ -127,6 +115,7 @@ function Get-DaylightSavings {
         1
     } else {0}
 
+    
     # Now output an object
     [PSCustomObject]@{
         TimeStamp = $Date
