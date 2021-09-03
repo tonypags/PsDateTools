@@ -127,6 +127,7 @@ function Get-DaylightSavings {
     # Now output an object
     [PSCustomObject]@{
         TimeStamp = $Date
+        CurrentBias = $TZo.Bias
         CurrentDstMode = $CurrentDstMode
         CurrentDstName = $CurrentDstName
         Win32_TimeZone = $TZo
