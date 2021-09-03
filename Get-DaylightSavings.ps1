@@ -46,8 +46,8 @@ function Get-DaylightSavings {
     $stdDate = Find-DateByWeekNumber @stdProps
     
 
-    # This calculates the current year std date that DST changes
-    $stdDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.DaylightDayOfWeek)
+    # This calculates the current year day date that DST changes
+    $dayDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.DaylightDayOfWeek)
     $dayProps = @{
         Ordinal = $TZo.DaylightDay
         DayOfWeek = $dayDayOfWeek
