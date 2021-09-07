@@ -1,4 +1,4 @@
-function Get-DaylightSavings {
+function Get-DaylightSaving {
     <#
     .SYNOPSIS
     Returns info about your timezone's DST
@@ -146,4 +146,4 @@ function Get-DaylightSavings {
         NextBias = $NextBias
     }
 
-}#END: function Get-DaylightSavings {}
+}#END: function Get-DaylightSaving {}
