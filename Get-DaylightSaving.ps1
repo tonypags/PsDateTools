@@ -22,120 +22,127 @@ function Get-DaylightSaving {
     $TZa = [System.TimeZoneInfo]::FindSystemTimeZoneById($TimeZone)
     $TZo = (Get-WmiObject win32_timezone)
 
-    # We'll use this logic twice
-    $indexToDayOfWeek = {param($index)
-        switch ($index) {
-            0 {'Sunday'}
-            1 {'Monday'}
-            2 {'Tuesday'}
-            3 {'Wednesday'}
-            4 {'Thursday'}
-            5 {'Friday'}
-            6 {'Saturday'}
+    if ($TZa.SupportsDaylightSavingTime) {
+
+        # We'll use this logic twice
+        $indexToDayOfWeek = {param($index)
+            switch ($index) {
+                0 {'Sunday'}
+                1 {'Monday'}
+                2 {'Tuesday'}
+                3 {'Wednesday'}
+                4 {'Thursday'}
+                5 {'Friday'}
+                6 {'Saturday'}
+            }
         }
-    }
 
-    # This calculates the current year std date that DST changes
-    $stdDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.StandardDayOfWeek)
-    $stdProps = @{
-        Ordinal = $TZo.StandardDay
-        DayOfWeek = $stdDayOfWeek
-        StartDate = "$($TZo.StandardMonth)/1"
-        EndDate   = "$($TZo.StandardMonth + 1)/1"
-    }
-    $stdDate = (Find-DateByWeekNumber @stdProps).AddHours(
-        $TZo.StandardHour).AddMinutes($TZo.StandardMinute
-        ).AddSeconds($TZo.StandardSecond).AddMilliseconds($TZo.StandardMillisecond)
-    
-
-    # This calculates the current year day date that DST changes
-    $dayDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.DaylightDayOfWeek)
-    $dayProps = @{
-        Ordinal = $TZo.DaylightDay
-        DayOfWeek = $dayDayOfWeek
-        StartDate = "$($TZo.DaylightMonth)/1"
-        EndDate = "$($TZo.DaylightMonth + 1)/1"
-    }
-    $dayDate = (Find-DateByWeekNumber @dayProps).AddHours(
-        $TZo.DaylightHour).AddMinutes($TZo.DaylightMinute
-        ).AddSeconds($TZo.DaylightSecond).AddMilliseconds($TZo.DaylightMillisecond)
-
-
-    # Now we can know where on the calendar we are now
-    if ($Date -ge $stdDate -or $Date -lt $dayDate) {
-        $CurrentDstMode = 'Standard'
-        $CurrentDstName = $TZa.StandardName
-        $NextDstMode = 'Daylight'
-        $NextDstName = $TZa.DaylightName
-        $NextBiasShiftDirection = 1 # Spring Ahead
-    } elseif ($Date -lt $stdDate -and $Date -ge $dayDate) {
-        $CurrentDstMode = 'Daylight'
-        $CurrentDstName = $TZa.DaylightName
-        $NextDstMode = 'Standard'
-        $NextDstName = $TZa.StandardName
-        $NextBiasShiftDirection = -1 # Fall Behind
-    }
-
-    # Adjust for next year if needed
-    if ($Date -ge $stdDate) {
-        $stdProps.Set_Item(
-            'StartDate' ,
-            ("$($TZo.StandardMonth)/1/$($Date.Year + 1)")
-        )
-        $stdProps.Set_Item(
-            'EndDate'   ,
-            ("$($TZo.StandardMonth + 1)/1/$($Date.Year + 1)")
-        )
+        # This calculates the current year std date that DST changes
+        $stdDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.StandardDayOfWeek)
+        $stdProps = @{
+            Ordinal = $TZo.StandardDay
+            DayOfWeek = $stdDayOfWeek
+            StartDate = "$($TZo.StandardMonth)/1"
+            EndDate   = "$($TZo.StandardMonth + 1)/1"
+        }
         $stdDate = (Find-DateByWeekNumber @stdProps).AddHours(
             $TZo.StandardHour).AddMinutes($TZo.StandardMinute
             ).AddSeconds($TZo.StandardSecond).AddMilliseconds($TZo.StandardMillisecond)
-    }
-    if ($Date -ge $dayDate) {
-        $dayProps.Set_Item(
-            'StartDate' ,
-            ("$($TZo.DaylightMonth)/1/$($Date.Year + 1)")
-        )
-        $dayProps.Set_Item(
-            'EndDate'   ,
-            ("$($TZo.DaylightMonth + 1)/1/$($Date.Year + 1)")
-        )
+        
+
+        # This calculates the current year day date that DST changes
+        $dayDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.DaylightDayOfWeek)
+        $dayProps = @{
+            Ordinal = $TZo.DaylightDay
+            DayOfWeek = $dayDayOfWeek
+            StartDate = "$($TZo.DaylightMonth)/1"
+            EndDate = "$($TZo.DaylightMonth + 1)/1"
+        }
         $dayDate = (Find-DateByWeekNumber @dayProps).AddHours(
             $TZo.DaylightHour).AddMinutes($TZo.DaylightMinute
             ).AddSeconds($TZo.DaylightSecond).AddMilliseconds($TZo.DaylightMillisecond)
-    }
 
 
-    # Now the next date for change is
-    $UntilNextChange = @(
-        [timespan]($stdDate - $Date)
-        [timespan]($dayDate - $Date)
-    ) | Sort-Object | Select-Object -First 1
-    $nextChange = $Date + $UntilNextChange
+        # Now we can know where on the calendar we are now
+        if ($Date -ge $stdDate -or $Date -lt $dayDate) {
+            $CurrentDstMode = 'Standard'
+            $CurrentDstName = $TZa.StandardName
+            $NextDstMode = 'Daylight'
+            $NextDstName = $TZa.DaylightName
+            $NextBiasShiftDirection = 1 # Spring Ahead
+        } elseif ($Date -lt $stdDate -and $Date -ge $dayDate) {
+            $CurrentDstMode = 'Daylight'
+            $CurrentDstName = $TZa.DaylightName
+            $NextDstMode = 'Standard'
+            $NextDstName = $TZa.StandardName
+            $NextBiasShiftDirection = -1 # Fall Behind
+        }
 
-    # and the bias is and will be 
-    # the current bias time, plus direction times DaylightBias
-    $NextBias = $TZo.Bias +
-        ($NextBiasShiftDirection * $TZo.DaylightBias)
-    # Also note if the Daylight Bias Direction is + or -
-    $DaylightBiasDirection = if ($TZo.DaylightBias -lt 0) {
-        -1
-    } elseif ($TZo.DaylightBias -gt 0) {
-        1
-    } else {0}
+        # Adjust for next year if needed
+        if ($Date -ge $stdDate) {
+            $stdProps.Set_Item(
+                'StartDate' ,
+                ("$($TZo.StandardMonth)/1/$($Date.Year + 1)")
+            )
+            $stdProps.Set_Item(
+                'EndDate'   ,
+                ("$($TZo.StandardMonth + 1)/1/$($Date.Year + 1)")
+            )
+            $stdDate = (Find-DateByWeekNumber @stdProps).AddHours(
+                $TZo.StandardHour).AddMinutes($TZo.StandardMinute
+                ).AddSeconds($TZo.StandardSecond).AddMilliseconds($TZo.StandardMillisecond)
+        }
+        if ($Date -ge $dayDate) {
+            $dayProps.Set_Item(
+                'StartDate' ,
+                ("$($TZo.DaylightMonth)/1/$($Date.Year + 1)")
+            )
+            $dayProps.Set_Item(
+                'EndDate'   ,
+                ("$($TZo.DaylightMonth + 1)/1/$($Date.Year + 1)")
+            )
+            $dayDate = (Find-DateByWeekNumber @dayProps).AddHours(
+                $TZo.DaylightHour).AddMinutes($TZo.DaylightMinute
+                ).AddSeconds($TZo.DaylightSecond).AddMilliseconds($TZo.DaylightMillisecond)
+        }
 
-    
-    # Now output an object
-    [PSCustomObject]@{
-        TimeStamp = $Date
-        CurrentBias = $TZo.Bias
-        CurrentDstMode = $CurrentDstMode
-        CurrentDstName = $CurrentDstName
-        Win32_TimeZone = $TZo
-        SystemChange = [pscustomobject]@{
+
+        # Now the next date for change is
+        $UntilNextChange = @(
+            [timespan]($stdDate - $Date)
+            [timespan]($dayDate - $Date)
+        ) | Sort-Object | Select-Object -First 1
+        $nextChange = $Date + $UntilNextChange
+
+        # and the bias is and will be 
+        # the current bias time, plus direction times DaylightBias
+        $NextBias = $TZo.Bias +
+            ($NextBiasShiftDirection * $TZo.DaylightBias)
+        # Also note if the Daylight Bias Direction is + or -
+        $DaylightBiasDirection = if ($TZo.DaylightBias -lt 0) {
+            -1
+        } elseif ($TZo.DaylightBias -gt 0) {
+            1
+        } else {0}
+
+        $SystemChange = [pscustomobject]@{
             IsFixedDateRule = $TZa.GetAdjustmentRules().DaylightTransitionEnd[-1].IsFixedDateRule
             DaylightTransitionStart = $TZa.GetAdjustmentRules().DaylightTransitionStart
             DaylightTransitionEnd = $TZa.GetAdjustmentRules().DaylightTransitionEnd
         }
+
+    }#END: if ($TZa.SupportsDaylightSavingTime) {
+    
+
+    # Now output an object
+    [PSCustomObject]@{
+        TimeStamp = $Date
+        CurrentBias = $TZo.Bias
+        SupportsDaylightSavingTime = $TZa.SupportsDaylightSavingTime
+        CurrentDstMode = $CurrentDstMode
+        CurrentDstName = $CurrentDstName
+        Win32_TimeZone = $TZo
+        SystemChange = $SystemChange
         NextStandardChangeOn = $stdDate
         NextDaylightChangeOn = $dayDate
         NextDstMode = $NextDstMode
@@ -146,4 +153,5 @@ function Get-DaylightSaving {
         NextBias = $NextBias
     }
 
+    
 }#END: function Get-DaylightSaving {}
