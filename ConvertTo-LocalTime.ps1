@@ -23,6 +23,7 @@ Register-ArgumentCompleter @argCompleteProps -ScriptBlock {
             $_.BaseUtcOffset
         )
     }
+    #https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter?view=powershell-5.1
 }
 
 function ConvertTo-LocalTime {
