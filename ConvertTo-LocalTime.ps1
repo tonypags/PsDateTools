@@ -119,6 +119,8 @@ function ConvertTo-LocalTime {
             
         $HoursToAdd = -($tzone.BaseUtcOffset.totalhours)
         
+        $DateTime.AddHours($HoursToAdd).ToLocalTime()
+        
     } elseif ($PSCmdlet.ParameterSetName -eq 'ByUtcHardcode') {
         
         $strCurrentTimeZone = (Get-WmiObject win32_timezone).StandardName
@@ -128,7 +130,5 @@ function ConvertTo-LocalTime {
     } else {
         throw "Parameter usage error. Type 'Get-Help ConvertTo-LocalTime -s' for more info."
     }
-        
-    $DateTime.AddHours($HoursToAdd).ToLocalTime()
 
 }#END: function ConvertTo-LocalTime {}
