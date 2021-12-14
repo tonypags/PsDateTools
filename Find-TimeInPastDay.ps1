@@ -17,24 +17,34 @@ function Find-TimeInPastDay {
     Number of days to skip
 
     .EXAMPLE
-    ($Date = Get-Date);$time = '23:55'
-    #Monday, December 13, 2021 4:15:31 PM
-    Find-TimeInPastDay $time -Date $Date -Debug
+    $Date = Get-Date 'Monday, December 13, 2021 4:15:31 PM'
+    $time = '23:55'
+    Find-TimeInPastDay $time -Date $Date
+    Sunday, December 12, 2021 11:55:59 PM
+    .EXAMPLE
+    $Date = Get-Date 'Wednesday, December 1, 2021 9:00:00 AM'
+    $time = '19:05:00'
+    Find-TimeInPastDay $time -Date $Date
+    Tuesday, November 30, 2021 7:05:00 PM
+    .NOTES
+    This function has some repeating logic that can be abstracted
+    to a scriptblock. It would require calling a method using a
+    variable string; if n/a then use a switch/if.
     #>
     [CmdletBinding()]
     param (
         # The time (HH:mm[:ss[.fff]] string)
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory,Position=0)]
         [string]
         $Time,
 
         # Datetime used as the day's reference point
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory,Position=1)]
         [datetime]
         $Date,
 
         # Number of days to skip
-        [Parameter()]
+        [Parameter(Position=2)]
         [ValidateNotNull()]
         [int]
         $Skip = 0
@@ -45,7 +55,7 @@ function Find-TimeInPastDay {
 
     # Seconds & Milliseconds are optional on the parameter string value
     # Find the time-parts like parameter values for Get-Date
-    $timeParts = $Time -split ':'
+    $timeParts = $Time -split ':|\.'
     $timeToFind = @{}
     $timeToFind.Hour = $timeParts[0] -as [int]
     $timeToFind.Minute = $timeParts[1] -as [int]
@@ -83,7 +93,7 @@ function Find-TimeInPastDay {
     Write-Debug "Minute +1 Found: $($Date.Minute)"
 
 
-    if ($timeToFind.Second) {
+    if ($timeToFind.ContainsKey('Second')) {
 
         While (
             # Subtract 1 Second until we get within 1 of the desired time
@@ -108,7 +118,7 @@ function Find-TimeInPastDay {
     }
 
 
-    if ($timeToFind.Millisecond) {
+    if ($timeToFind.ContainsKey('Millisecond')) {
 
         While (
             # Subtract 1 Millisecond until we get within 1 of the desired time
@@ -121,7 +131,7 @@ function Find-TimeInPastDay {
 
     } else {
 
-        if ($timeToFind.Second) {
+        if ($timeToFind.ContainsKey('Second')) {
 
             While (
                 # Subtract 1 Second until we get within 1 of the desired time
