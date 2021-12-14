@@ -71,7 +71,15 @@ function Find-TimeInPastDay {
         )
     ) {
         $Date = $Date | Get-TruncatedDate -Truncate 'Hour'
-        $Date = $Date.AddMilliseconds(-1)
+
+        # This transform depends on if we received seconds or milliseconds in $Time string
+        $Date = if ($timeToFind.ContainsKey('Millisecond')) {
+            $Date.AddMilliseconds(-1)
+        } elseif ($timeToFind.ContainsKey('Second')) {
+            $Date.AddSeconds(-1)
+        } else {
+            $Date.AddMinutes(-1)
+        }
     }
 
     While (
