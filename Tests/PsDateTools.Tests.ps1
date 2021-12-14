@@ -23,15 +23,45 @@ Describe 'PsDateTools Tests' {
             $script:funcNames = $script:funcNames | Where-Object {$_ -ne $script:thisName}
         }
 
-        It -Tag 'new' 'Finds the oldest date in a range of times based on a date and 2 times' {
+        It 'Finds the datetime value for a given time and reference date' {
+            $Date = Get-Date 'Monday, December 13, 2021 4:15:31 PM'
+            $time = '23:55'
+            $pastDate = Find-TimeInPastDay $time -Date $Date
+            $pastDate.Day | Should -Be 12
+            $pastDate.Hour | Should -Be 23
+            $pastDate.Minute | Should -Be 55
+            $time = '23:55:46'
+            $pastDate = Find-TimeInPastDay $time -Date $Date
+            $pastDate.Second | Should -Be 46
+            $time = '23:05:01.999'
+            $pastDate = Find-TimeInPastDay $time -Date $Date
+            $pastDate.Minute | Should -Be 5
+            $pastDate.Millisecond | Should -Be 999
+
+        }
+
+        It 'Test if a given time is between 2 other given times' {
+            @(
+                (Test-TimeInRange -ref '12:00:30' -Start '12:00' -End '17:00'),
+                (Test-TimeInRange -ref '12:00' -Start '22:00' -End '05:00:00'),
+                (Test-TimeInRange -ref '02:00:00' -Start '22:00:00' -End '05:00')
+            ) | Should -Be @($true, $false, $true)
+        }
+
+
+
+
+        It -tag 'draft' Finds the oldest date in a range of times' {# based on a date, a frequency(timespan), and 2 times
             $timeProps = @{}
+            # The frequency (timespan) expected within the timeframe
+            $timeProps.Frequency = $null
             # The date being referenced (normally current datetime)
             $timeProps.Date = $null
             # The start time (HH:mm[:ss] string or datetime with date-part ignored)
             $timeProps.StartTime = $null
             # The end time (HH:mm[:ss] string or datetime with date-part ignored)
             $timeProps.EndTime = $null
-            
+
             # Test actionable timeframes
             $Times = @(
                 @('17:00','21:00')
