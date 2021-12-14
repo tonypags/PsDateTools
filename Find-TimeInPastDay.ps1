@@ -91,13 +91,13 @@ function Find-TimeInPastDay {
     Write-Debug "Hour +1 Found: $($Date.Hour)"
 
 
-    Do {
-        $Date = $Date.AddMinutes(-1)
-    } While (
+    While (
         # Subtract 1 Minute until we get within 1 of the desired time
         $Date.Minute -gt $timeToFind.Minute + 1 -or
         $Date.Hour -ne $timeToFind.Hour
-    )
+    ) {
+        $Date = $Date.AddMinutes(-1)
+    } 
     Write-Debug "Minute +1 Found: $($Date.Minute)"
 
 
