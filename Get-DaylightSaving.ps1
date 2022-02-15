@@ -5,7 +5,7 @@ function Get-DaylightSaving {
     .DESCRIPTION
     Returns info about your timezone's DST, including start and end times.
     .EXAMPLE
-    Get-DaylightSavings 
+    Get-DaylightSaving
     .OUTPUTS
     A PsCustomObject with a Win32_TimeZone object as one of its properties.
     #>
@@ -18,9 +18,9 @@ function Get-DaylightSaving {
         $Date = (Get-Date)
     )
     
-    $TimeZone = (Get-WmiObject win32_timezone).StandardName
+    $TZo = Get-WmiObject win32_timezone
+    $TimeZone = $TZo.StandardName
     $TZa = [System.TimeZoneInfo]::FindSystemTimeZoneById($TimeZone)
-    $TZo = (Get-WmiObject win32_timezone)
 
     if ($TZa.SupportsDaylightSavingTime) {
 
@@ -48,7 +48,7 @@ function Get-DaylightSaving {
         $stdDate = (Find-DateByWeekNumber @stdProps).AddHours(
             $TZo.StandardHour).AddMinutes($TZo.StandardMinute
             ).AddSeconds($TZo.StandardSecond).AddMilliseconds($TZo.StandardMillisecond)
-        
+        #
 
         # This calculates the current year day date that DST changes
         $dayDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.DaylightDayOfWeek)
@@ -61,22 +61,33 @@ function Get-DaylightSaving {
         $dayDate = (Find-DateByWeekNumber @dayProps).AddHours(
             $TZo.DaylightHour).AddMinutes($TZo.DaylightMinute
             ).AddSeconds($TZo.DaylightSecond).AddMilliseconds($TZo.DaylightMillisecond)
-
+        #
 
         # Now we can know where on the calendar we are now
         if ($Date -ge $stdDate -or $Date -lt $dayDate) {
             $CurrentDstMode = 'Standard'
             $CurrentDstName = $TZa.StandardName
+            $CurrentBias = $TZo.Bias - $TZo.StandardBias
             $NextDstMode = 'Daylight'
             $NextDstName = $TZa.DaylightName
-            $NextBiasShiftDirection = 1 # Spring Ahead
+            $NextBias = $TZo.Bias - $TZo.DaylightBias
+
         } elseif ($Date -lt $stdDate -and $Date -ge $dayDate) {
             $CurrentDstMode = 'Daylight'
             $CurrentDstName = $TZa.DaylightName
+            $CurrentBias = $TZo.Bias - $TZo.DaylightBias
             $NextDstMode = 'Standard'
             $NextDstName = $TZa.StandardName
-            $NextBiasShiftDirection = -1 # Fall Behind
+            $NextBias = $TZo.Bias - $TZo.StandardBias
+            
         }
+        
+        $NextBiasShift = $NextBias - $CurrentBias
+        $NextBiasShiftDirection = if ($NextBiasShift -lt 0) {
+            -1
+        } elseif ($NextBiasShift -gt 0) {
+            1
+        } else {0}
 
         # Adjust for next year if needed
         if ($Date -ge $stdDate) {
@@ -114,17 +125,6 @@ function Get-DaylightSaving {
         ) | Sort-Object | Select-Object -First 1
         $nextChange = $Date + $UntilNextChange
 
-        # and the bias is and will be 
-        # the current bias time, plus direction times DaylightBias
-        $NextBias = $TZo.Bias +
-            ($NextBiasShiftDirection * $TZo.DaylightBias)
-        # Also note if the Daylight Bias Direction is + or -
-        $DaylightBiasDirection = if ($TZo.DaylightBias -lt 0) {
-            -1
-        } elseif ($TZo.DaylightBias -gt 0) {
-            1
-        } else {0}
-
         $SystemChange = [pscustomobject]@{
             IsFixedDateRule = $TZa.GetAdjustmentRules().DaylightTransitionEnd[-1].IsFixedDateRule
             DaylightTransitionStart = $TZa.GetAdjustmentRules().DaylightTransitionStart
@@ -135,9 +135,9 @@ function Get-DaylightSaving {
     
 
     # Now output an object
-    [PSCustomObject]@{
+    [PSCustomObject][ordered]@{
         TimeStamp = $Date
-        CurrentBias = $TZo.Bias
+        CurrentBias = $CurrentBias
         SupportsDaylightSavingTime = $TZa.SupportsDaylightSavingTime
         CurrentDstMode = $CurrentDstMode
         CurrentDstName = $CurrentDstName
@@ -149,7 +149,7 @@ function Get-DaylightSaving {
         NextDstName = $NextDstName
         NextChange = $nextChange
         UntilNextChange = $UntilNextChange
-        NextBiasShiftDirection = $NextBiasShiftDirection * $DaylightBiasDirection
+        NextBiasShiftDirection = $NextBiasShiftDirection
         NextBias = $NextBias
     }
 
