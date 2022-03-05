@@ -37,26 +37,30 @@ function Get-DaylightSaving {
             }
         }
 
-        # This calculates the current year std date that DST changes
+        # Here, 12 + 1 SHOULD equal 1 (January)
+        $monthAfterDaylight = if (($TZo.DaylightMonth + 1) -eq 13) {1} else {$TZo.DaylightMonth + 1}
+        $monthAfterStandard = if (($TZo.StandardMonth + 1) -eq 13) {1} else {$TZo.StandardMonth + 1}
+
+        # This calculates the standard date that DST changes in the given year
         $stdDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.StandardDayOfWeek)
         $stdProps = @{
             Ordinal = $TZo.StandardDay
             DayOfWeek = $stdDayOfWeek
-            StartDate = "$($TZo.StandardMonth)/1"
-            EndDate   = "$($TZo.StandardMonth + 1)/1"
+            StartDate = Get-Date -Year ($Date.Year) -Month ($TZo.StandardMonth) -Day 1 | Get-TruncatedDate -Truncate Hour
+            EndDate = Get-Date -Year ($Date.Year) -Month $monthAfterStandard -Day 1 | Get-TruncatedDate -Truncate Hour
         }
         $stdDate = (Find-DateByWeekNumber @stdProps).AddHours(
             $TZo.StandardHour).AddMinutes($TZo.StandardMinute
             ).AddSeconds($TZo.StandardSecond).AddMilliseconds($TZo.StandardMillisecond)
         #
 
-        # This calculates the current year day date that DST changes
+        # This calculates the daylight date that DST changes in the given year
         $dayDayOfWeek = Invoke-Command -ScriptBlock $indexToDayOfWeek -ArgumentList ($TZo.DaylightDayOfWeek)
         $dayProps = @{
             Ordinal = $TZo.DaylightDay
             DayOfWeek = $dayDayOfWeek
-            StartDate = "$($TZo.DaylightMonth)/1"
-            EndDate = "$($TZo.DaylightMonth + 1)/1"
+            StartDate = Get-Date -Year ($Date.Year) -Month ($TZo.DaylightMonth) -Day 1 | Get-TruncatedDate -Truncate Hour
+            EndDate = Get-Date -Year ($Date.Year) -Month $monthAfterDaylight -Day 1 | Get-TruncatedDate -Truncate Hour
         }
         $dayDate = (Find-DateByWeekNumber @dayProps).AddHours(
             $TZo.DaylightHour).AddMinutes($TZo.DaylightMinute
