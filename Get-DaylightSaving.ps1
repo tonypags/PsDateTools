@@ -8,6 +8,8 @@ function Get-DaylightSaving {
     Get-DaylightSaving
     .OUTPUTS
     A PsCustomObject with a Win32_TimeZone object as one of its properties.
+    .NOTES
+    The timezone can't be parameterized?
     #>
     [CmdletBinding()]
     param (
@@ -15,11 +17,22 @@ function Get-DaylightSaving {
         [Parameter(Position=0)]
         [ValidateNotNull()]
         [datetime]
-        $Date = (Get-Date)
+        $Date = (Get-Date),
+        
+        # Provide a timezine, defaults to current config
+        [Parameter(Position=1)]
+        [ValidateNotNull()]
+        [ValidateSet({[TimeZoneInfo]::GetSystemTimeZones().Id})]
+        [string]
+        $TimeZone = (Get-WmiObject win32_timezone).StandardName
     )
     
-    $TZo = Get-WmiObject win32_timezone
-    $TimeZone = $TZo.StandardName
+    ### Wait, I can't not use this local timezone info, unless I rewrite the logic below. -TP
+    ### Wait, I can't not use this local timezone info, unless I rewrite the logic below. -TP
+    ### Wait, I can't not use this local timezone info, unless I rewrite the logic below. -TP
+    ### Wait, I can't not use this local timezone info, unless I rewrite the logic below. -TP
+    # $TZo = Get-WmiObject win32_timezone
+    # $TimeZone = $TZo.StandardName
     $TZa = [System.TimeZoneInfo]::FindSystemTimeZoneById($TimeZone)
 
     if ($TZa.SupportsDaylightSavingTime) {
