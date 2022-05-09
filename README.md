@@ -5,16 +5,14 @@ Cmdlets for Manipulating dates in PowerShell.
 
 # Getting Started
 1.	Installation process 
-<!--
     Access to the repository required:
 
-        $repo = 'PsGallery' # Private internal repo is preferred
+        $repo = 'PsGallery'
         Install-Module -Name PsDateTools -Repository $repo
--->
 
     Without Repository available, clone directly from Git:
 
-        $uri = ' '.Trim()
+        $uri = 'https://github.com/tonypags/PsDateTools'.Trim()
         $ModuleParent = $env:PSModulePath -split ';' | Where {$_ -like "*$($env:USERNAME)*"} | Select -First 1
         Set-Location $ModuleParent
         git clone $uri
@@ -37,6 +35,7 @@ Cmdlets for Manipulating dates in PowerShell.
 
     - v0.0.1.0  - Initial Commit.
     - v0.2.0.10 - Folder Restructure.
+    - v0.2.0.13 - Added build files for psdeploy
 
 <br>
 
@@ -77,6 +76,12 @@ A ```psake``` script has been created to manage the various operations related t
 * Deploy the script via PSDeploy  
 ```powershell
 .\build.ps1 -Task Deploy
+
+```
+
+* Publish the script via PSDeploy  
+```powershell
+.\build.ps1 -Task Package
 
 ```
 

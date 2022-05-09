@@ -24,3 +24,7 @@ task Test {
 task Deploy -depends Analyze, Test {
     Invoke-PSDeploy -Path "$PSScriptRoot\psdeploy.ps1" -Force -Verbose:$VerbosePreference
 }
+
+task Package -depends Deploy {
+    Invoke-PSDeploy -Path "$PSScriptRoot\pspackage.ps1" -Force -Verbose:$VerbosePreference
+}
