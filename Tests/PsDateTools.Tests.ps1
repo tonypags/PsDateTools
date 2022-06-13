@@ -6,6 +6,11 @@ Describe 'PsDateTools Tests' {
         $script:funcNames = $thisModule.ExportedCommands.Values |
             Where-Object {$_.CommandType -eq 'Function'} |
             Select-Object -ExpandProperty Name
+
+        # dot-sourcing all functions: Required for Mocking
+        Get-ChildItem   $PSScriptRoot\..\Private\*.ps1,
+                        $PSScriptRoot\..\Public\*.ps1   |
+        ForEach-Object {. $_.FullName}
     }
 
     Context 'Test Module import' {
@@ -51,7 +56,8 @@ Describe 'PsDateTools Tests' {
 
 
 
-        It -tag 'draft' Finds the oldest date in a range of times' {# based on a date, a frequency(timespan), and 2 times
+        It -tag 'draft' 'Finds the oldest date in a range of times' {
+            # based on a date, a frequency(timespan), and 2 times
             $timeProps = @{}
             # The frequency (timespan) expected within the timeframe
             $timeProps.Frequency = $null
