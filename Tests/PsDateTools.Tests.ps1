@@ -49,12 +49,10 @@ Describe 'PsDateTools Tests' {
             @(
                 (Test-TimeInRange -ref '12:00:30' -Start '12:00' -End '17:00'),
                 (Test-TimeInRange -ref '12:00' -Start '22:00' -End '05:00:00'),
-                (Test-TimeInRange -ref '02:00:00' -Start '22:00:00' -End '05:00')
-            ) | Should -Be @($true, $false, $true)
+                (Test-TimeInRange -ref '02:00:00' -Start '22:00:00' -End '05:00'),
+                (Test-TimeInRange -ref '12:00' -Start '12:00' -End '17:00')
+            ) | Should -Be @($true, $false, $true,$true)
         }
-
-
-
 
         It -tag 'draft' 'Finds the oldest date in a range of times' {
             # based on a date, a frequency(timespan), and 2 times
