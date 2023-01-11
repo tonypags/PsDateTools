@@ -106,6 +106,119 @@ Describe 'PsDateTools Tests' {
             $script:thisName = 'Find-TimeInRange'
         }
 
+        It 'Finds a conflict between 2 events' {
+            # 2 events separated by 2 hours
+            $props = @{}
+            $props.ReferenceStart = '1/1/2000 1:00 AM'
+            $props.ReferenceEnd = '1/1/2000 5:00 AM'
+            $props.DifferenceStart = '1/1/2000 7:00 AM'
+            $props.DifferenceEnd = '1/1/2000 11:00 AM'
+            $props.GracePeriod = New-TimeSpan -Hours 2
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $false
+            $diffEvents.exactSame | Should -Be $false
+            
+            $props.GracePeriod = New-TimeSpan -Hours 3
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $false
+            $diffEvents.exactSame | Should -Be $false
+
+            $props.GracePeriod = -(New-TimeSpan -Hours 2)
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $false
+            $diffEvents.exactSame | Should -Be $false
+
+            $props.GracePeriod = -(New-TimeSpan -Hours 3)
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $false
+
+            # 2 events overlapping by 2 hours
+            $props.ReferenceEnd = '1/1/2000 7:00 AM'
+            $props.DifferenceStart = '1/1/2000 5:00 AM'
+            $props.GracePeriod = New-TimeSpan -Hours 2
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $false
+            $diffEvents.exactSame | Should -Be $false
+            
+            $props.GracePeriod = New-TimeSpan -Hours 1
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $false
+
+            $props.GracePeriod = -(New-TimeSpan -Hours 2)
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $false
+
+            $props.GracePeriod = -(New-TimeSpan -Hours 3)
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $false
+
+            # 2 events start same time but finish 2 hours diff
+            $props = @{}
+            $props.ReferenceStart = '1/1/2000 1:00 AM'
+            $props.DifferenceStart = '1/1/2000 1:00 AM'
+            $props.ReferenceEnd = '1/1/2000 5:00 AM'
+            $props.DifferenceEnd = '1/1/2000 7:00 AM'
+            $props.GracePeriod = New-TimeSpan -Hours 4
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $false
+            $diffEvents.exactSame | Should -Be $false
+
+            $props.GracePeriod = New-TimeSpan -Hours 3
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $false
+
+            $props.GracePeriod = -(New-TimeSpan -Hours 1)
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $false
+            
+            # 2 events end same time but start 2 hours diff
+            $props = @{}
+            $props.ReferenceStart = '1/1/2000 1:00 AM'
+            $props.DifferenceStart = '1/1/2000 3:00 AM'
+            $props.ReferenceEnd = '1/1/2000 7:00 AM'
+            $props.DifferenceEnd = '1/1/2000 7:00 AM'
+            $props.GracePeriod = New-TimeSpan -Hours 4
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $false
+            $diffEvents.exactSame | Should -Be $false
+
+            $props.GracePeriod = New-TimeSpan -Hours 3
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $false
+
+            $props.GracePeriod = -(New-TimeSpan -Hours 1)
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $false
+
+            # 2 exact same events
+            $props = @{}
+            $props.ReferenceStart = '1/1/2000 1:00 AM'
+            $props.DifferenceStart = '1/1/2000 1:00 AM'
+            $props.ReferenceEnd = '1/1/2000 7:00 AM'
+            $props.DifferenceEnd = '1/1/2000 7:00 AM'
+            $props.GracePeriod = New-TimeSpan -Hours 6
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $false
+            $diffEvents.exactSame | Should -Be $true
+
+            $props.GracePeriod = New-TimeSpan -Hours 3
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $true
+
+            $props.GracePeriod = -(New-TimeSpan -Hours 1)
+            $diffEvents = Compare-Events @props
+            $diffEvents.hasConflict | Should -Be $true
+            $diffEvents.exactSame | Should -Be $true
+        }
     }
 
     Context 'Clean up' {
