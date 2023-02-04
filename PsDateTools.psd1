@@ -1,15 +1,10 @@
-﻿# All below copied from PSExcel module, with the DLL part removed. 
-# If youwant to copy, just change the PSM1 file name to match yours, 
-#  and run "New-Guid|clip" in PoSh to generate a new guid for your module. 
-# Also RequiredModules
-
-@{
+﻿@{
 
 # Script module or binary module file associated with this manifest.
 ModuleToProcess = 'PsDateTools.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.1.0'
+ModuleVersion = '0.2.0.10'
 
 # ID used to uniquely identify this module
 GUID = '57b1aa18-a165-477d-8e83-608ede0dd3c8'
@@ -18,7 +13,7 @@ GUID = '57b1aa18-a165-477d-8e83-608ede0dd3c8'
 Author = 'Tony Pagliaro'
 
 # Company or vendor of this module
-# CompanyName = 'RFA, Inc.'
+# CompanyName = ''
 
 # Copyright statement for this module
 # Copyright = ''
