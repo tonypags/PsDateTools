@@ -103,7 +103,7 @@ function Compare-Events {
 
     )#END: param()
 
-    $hasLocation = -not ([string]::isnullorempty($ReferenceLocation) -and [string]::isnullorempty($DifferenceLocation))
+    $hasLocation = -not ([string]::IsNullOrWhiteSpace($ReferenceLocation) -and [string]::IsNullOrWhiteSpace($DifferenceLocation))
     $SameTime    = $false
     $SamePlace   = $false
 
