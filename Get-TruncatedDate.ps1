@@ -1,5 +1,16 @@
-function Get-TruncatedDate
-{
+function Get-TruncatedDate {
+    <#
+    .NOTES
+    This
+
+        (Get-Date).Date
+    
+    Does the same thing as
+    
+        Get-Date | Get-TruncatedDate -Truncate 'Hour'
+    
+    FYI only
+    #>
     [CmdletBinding ()]
     Param
     (
