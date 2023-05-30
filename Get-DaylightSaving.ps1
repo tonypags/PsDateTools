@@ -18,7 +18,7 @@ function Get-DaylightSaving {
         $Date = (Get-Date)
     )
     
-    $TZo = Get-WmiObject win32_timezone
+    $TZo = Get-CimInstance win32_timezone
     $TimeZone = $TZo.StandardName
     $TZa = [System.TimeZoneInfo]::FindSystemTimeZoneById($TimeZone)
 

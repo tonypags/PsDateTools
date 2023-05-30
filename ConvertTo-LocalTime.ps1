@@ -61,7 +61,7 @@ function ConvertTo-LocalTime {
     logic when looping many records, try using this:
     
     $UtcDate = [datetime]'9/1/2021'
-    $strCurrentTimeZone = (Get-WmiObject win32_timezone).StandardName
+    $strCurrentTimeZone = (Get-CimInstance win32_timezone).StandardName
     $TZ = [System.TimeZoneInfo]::FindSystemTimeZoneById($strCurrentTimeZone)
     [System.TimeZoneInfo]::ConvertTimeFromUtc($UtcDate, $TZ)
 
@@ -122,8 +122,8 @@ function ConvertTo-LocalTime {
         $DateTime.AddHours($HoursToAdd).ToLocalTime()
         
     } elseif ($PSCmdlet.ParameterSetName -eq 'ByUtcHardcode') {
-        
-        $strCurrentTimeZone = (Get-WmiObject win32_timezone).StandardName
+
+        $strCurrentTimeZone = (Get-CimInstance win32_timezone).StandardName
         $TZ = [System.TimeZoneInfo]::FindSystemTimeZoneById($strCurrentTimeZone)
         [System.TimeZoneInfo]::ConvertTimeFromUtc($DateTime, $TZ)
 

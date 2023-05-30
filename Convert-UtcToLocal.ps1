@@ -13,7 +13,7 @@ function Convert-UtcToLocal {
         $UtcDate
     )
 
-    $strCurrentTimeZone = (Get-WmiObject win32_timezone).StandardName
+    $strCurrentTimeZone = (Get-CimInstance win32_timezone).StandardName
     $TZ = [System.TimeZoneInfo]::FindSystemTimeZoneById($strCurrentTimeZone)
     [System.TimeZoneInfo]::ConvertTimeFromUtc($UtcDate, $TZ)
     
