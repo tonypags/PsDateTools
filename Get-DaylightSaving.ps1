@@ -101,7 +101,7 @@ function Get-DaylightSaving {
             )
             $stdProps.Set_Item(
                 'EndDate'   ,
-                ("$($TZo.StandardMonth + 1)/1/$($Date.Year + 1)")
+                ([datetime]("$($TZo.StandardMonth + 1)/1/$($Date.Year + 1)")).AddTicks(-1)
             )
             $stdDate = (Find-DateByWeekNumber @stdProps).AddHours(
                 $TZo.StandardHour).AddMinutes($TZo.StandardMinute
@@ -114,7 +114,7 @@ function Get-DaylightSaving {
             )
             $dayProps.Set_Item(
                 'EndDate'   ,
-                ("$($TZo.DaylightMonth + 1)/1/$($Date.Year + 1)")
+                ([datetime]("$($TZo.DaylightMonth + 1)/1/$($Date.Year + 1)")).AddTicks(-1)
             )
             $dayDate = (Find-DateByWeekNumber @dayProps).AddHours(
                 $TZo.DaylightHour).AddMinutes($TZo.DaylightMinute
