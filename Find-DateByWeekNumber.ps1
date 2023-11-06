@@ -278,7 +278,7 @@
         }
 
         # Output the result
-        Write-Verbose "Output pending"
-        Write-Output $ResultDates
+        Write-Debug "Output pending"
+        $ResultDates
     }
 }
