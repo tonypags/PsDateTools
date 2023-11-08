@@ -46,8 +46,8 @@ function Get-DaylightSaving {
         $stdProps = @{
             Ordinal = $TZo.StandardDay
             DayOfWeek = $stdDayOfWeek
-            StartDate = Get-Date -Year ($Date.Year) -Month ($TZo.StandardMonth) -Day 1 | Get-TruncatedDate -Truncate Hour
-            EndDate = Get-Date -Year ($Date.Year) -Month $monthAfterStandard -Day 1 | Get-TruncatedDate -Truncate Hour
+            StartDate = (Get-Date -Year $Date.Year -Month $TZo.StandardMonth -Day 1).Date
+            EndDate = (Get-Date -Year $Date.Year -Month $monthAfterStandard -Day 1).Date.AddTicks(-1)
         }
         $stdDate = (Find-DateByWeekNumber @stdProps).AddHours(
             $TZo.StandardHour).AddMinutes($TZo.StandardMinute
@@ -59,8 +59,8 @@ function Get-DaylightSaving {
         $dayProps = @{
             Ordinal = $TZo.DaylightDay
             DayOfWeek = $dayDayOfWeek
-            StartDate = Get-Date -Year ($Date.Year) -Month ($TZo.DaylightMonth) -Day 1 | Get-TruncatedDate -Truncate Hour
-            EndDate = Get-Date -Year ($Date.Year) -Month $monthAfterDaylight -Day 1 | Get-TruncatedDate -Truncate Hour
+            StartDate = (Get-Date -Year $Date.Year -Month $TZo.DaylightMonth -Day 1).Date
+            EndDate = (Get-Date -Year $Date.Year -Month $monthAfterDaylight -Day 1).Date.AddTicks(-1)
         }
         $dayDate = (Find-DateByWeekNumber @dayProps).AddHours(
             $TZo.DaylightHour).AddMinutes($TZo.DaylightMinute
