@@ -165,15 +165,15 @@
 
             Write-Verbose "Handle FullYear"
             # Get this month's first day, then add a year and minus a day
-            $StartDate = Get-Date | Get-TruncatedDate -Truncate Hour
+            $StartDate = (Get-Date).Date
             $EndDate = $StartDate.AddYears(1).AddDays(-1)
 
         } elseif ($StartDate) {
 
             Write-Verbose "Handle StartDate"
             # Truncate the entered dates' times
-            $StartDate = $StartDate | Get-TruncatedDate -Truncate Hour
-            $EndDate = $EndDate | Get-TruncatedDate -Truncate Hour
+            $StartDate = $StartDate.Date
+            $EndDate = $EndDate.Date
 
         } elseif (!$StartDate) {
             

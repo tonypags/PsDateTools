@@ -36,7 +36,7 @@ function Get-DateRange {
         $i -le $EndDate;
         $i = $i.AddDays(1)
     )
-    { [void]($DateArray.Add(($i | Get-TruncatedDate -Truncate Hour )))}
+    { [void]($DateArray.Add(($i.Date)))}
 
     if($Extremes){
         $FullArray = $DateArray | Sort-Object
